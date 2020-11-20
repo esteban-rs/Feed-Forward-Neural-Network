@@ -242,7 +242,7 @@ void DataSet::normalize() {
 Neural_NewtworkFF::Neural_NewtworkFF(int hidden_layers, DataSet &dataset) {
     // set size by console
     int size = 0;
-    cout << "Number of Neurons for Layer[0]: ";
+    cout << "Neurons for Layer[0]:     ";
     cin >> size;
 
     // First Hidden Layer
@@ -250,7 +250,8 @@ Neural_NewtworkFF::Neural_NewtworkFF(int hidden_layers, DataSet &dataset) {
 
     // Hidden Layers
     for (int i = 1; i < hidden_layers; i++){
-        cout << "Number of Neurons for Layer[" << i << "]: ";
+
+        cout << "Neurons for Layer[" << i << "]:    ";
         cin >> size;
 
         Layers.push_back(Layer(Layers[i-1].get_num_neurons(), size));
@@ -353,16 +354,16 @@ void Neural_NewtworkFF::show_training_set(DataSet &mydataset){
 }
 
 void Neural_NewtworkFF::show_info() {
-    cout << "----------------------" << endl;
+    cout << "--- Network  Architecture ---"<< endl;
 
     cout <<"Neurons in Layer[0]: "<< num_inputs << endl;
 
     for (int i = 0; i < num_layers; i++){
         cout <<"Neurons in Layer["<< i+1 << "]: "<< Layers[i].get_num_neurons() << endl;
     }
-    cout << "----------------------" << endl;
 
-    cout << "Epochs for training: " << total_epochs << endl;
+    cout << "-----------------------------"<< endl;
+    cout << "Epochs for training:      " << total_epochs << endl;
     cout << "* Layer[0] has a bias neuron." << endl;
 }
 

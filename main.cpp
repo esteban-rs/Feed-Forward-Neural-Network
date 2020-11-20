@@ -6,40 +6,46 @@
 int main(int argc, char const *argv[]){
     /* *** D a t a S e t  S e t u p *** */
     string filename;
-    cout << "Input DataSet Filename: ";
+    cout << "Input DataSet Filename:   ";
     cin >> filename;
+    cout << endl;
 
     DataSet mydataset(filename);
 
+    cout << "---- Neural Network Setup ----"<< endl;
 
-    /* *** N e t w o r k  S e t u p *** */
     int size = 0;
-    cout << "Number of Hidden Layers: ";
+    cout << "Number of Hidden Layers:  ";
     cin >> size;
 
     Neural_NewtworkFF mynetwork(size, mydataset);
+
+    cout << endl;
+    cout << "------ Parameters Setup ------"<< endl;
 
     int epochs = 0;
     cout << "Maximum Number of Epochs: ";
     cin >> epochs;
 
     double tol = 0;
-    cout << "Tolerance: ";
+    cout << "Tolerance:                ";
     cin >> tol;
 
     double eta = 0;
-    cout << "Learning rate: ";
+    cout << "Learning rate:            ";
     cin >> eta;
-    
+    cout << endl;
+
     clock_t start = clock();
     
     mynetwork.train_online(epochs, tol, eta, mydataset);
     
     clock_t end = clock();
     double cpu_time_used = ((double)(end - start))/CLOCKS_PER_SEC; 
-    printf("Execution Time : %lf segundos.\n",cpu_time_used);
     
     mynetwork.show_info();
+    
+    cout << endl << "Execution Time : " << cpu_time_used << "segundos." << endl; 
 
     /*for (int i = 0; i < mynetwork.cum_error.size(); i++){
         cout << mynetwork.cum_error[i] << endl;
