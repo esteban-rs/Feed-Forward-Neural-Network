@@ -2,6 +2,7 @@
 #include <time.h>
 #include "neural_network.hpp"
 
+// Agregar tiempo 
 int main(int argc, char const *argv[]){
     /* *** D a t a S e t  S e t u p *** */
     string filename;
@@ -27,16 +28,22 @@ int main(int argc, char const *argv[]){
     cin >> tol;
 
     double eta = 0;
-    cout << "Leargin rate: ";
+    cout << "Learning rate: ";
     cin >> eta;
-
+    
+    clock_t start = clock();
+    
     mynetwork.train_online(epochs, tol, eta, mydataset);
-
+    
+    clock_t end = clock();
+    double cpu_time_used = ((double)(end - start))/CLOCKS_PER_SEC; 
+    printf("Execution Time : %lf segundos.\n",cpu_time_used);
+    
     mynetwork.show_info();
 
-    for (int i = 0; i < mynetwork.cum_error.size(); i++){
+    /*for (int i = 0; i < mynetwork.cum_error.size(); i++){
         cout << mynetwork.cum_error[i] << endl;
-    }
+    }*/
     //mynetwork.show_training_set(mydataset);
 
 
