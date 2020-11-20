@@ -2,6 +2,8 @@
 #include "neural_network.hpp"
 #include <time.h>
 
+/* ************** N e u r o n  C l a s s ************** */
+
 Neuron::Neuron(double numberOfInputs) {
     // Conections of the Neuron
     number_of_inputs = numberOfInputs;
@@ -126,10 +128,10 @@ double Layer::AcumulateDelta(int i, Layer &nextlayer) {
     return sum;
 }
 
-void Layer::updateWeigths(vector <double> &inputs) {
+void Layer::updateWeigths(vector <double> &inputs, double eta) {
     for (int i = 0; i < number_of_neurons; i++){
         for (int j = 0; j < Neurons[i].weigths.size(); j++){
-            Neurons[i].weigths[j] += -1 * Neurons[i].delta * inputs[j];
+            Neurons[i].weigths[j] += -eta * Neurons[i].delta * inputs[j];
         }
     }
 }
@@ -169,7 +171,7 @@ DataSet::DataSet(string filename) {
         // Read Y
         file >> y;
         data.push_back(tmp);
-        targets.push_back(y);
+        targets.push_back({y});
     }
 
     file.close();
@@ -184,13 +186,6 @@ void DataSet::get_info() {
     cout << "Inputs:  " << num_inputs << endl;
     cout << "Data for training: " << data.size() << endl;
     cout << "Flags for Normalization " << endl;
-    for (int i = 0; i < data.size(); i++){
-        cout << "[" << i << "]";
-        for (int j = 0; j < num_inputs; j++){
-            cout << data[i][j] << " ";
-        }
-        cout << endl;
-    }
 }
 
 void DataSet::normalize() {
@@ -240,4 +235,137 @@ void DataSet::normalize() {
     }
     // Increase size for bias
     num_inputs++;
+}
+
+/* ************** N e u r a l  N e t w o r k ************** */
+
+Neural_NewtworkFF::Neural_NewtworkFF(int hidden_layers, DataSet &dataset) {
+    // set size by console
+    int size = 0;
+    cout << "Number of Neurons for Layer[0]: ";
+    cin >> size;
+
+    // First Hidden Layer
+    Layers.push_back(Layer(dataset.data[0].size(), size));
+
+    // Hidden Layers
+    for (int i = 1; i < hidden_layers; i++){
+        cout << "Number of Neurons for Layer[" << i << "]: ";
+        cin >> size;
+
+        Layers.push_back(Layer(Layers[i-1].get_num_neurons(), size));
+        num_layers++;
+    }
+    // Output Layer
+    Layers.push_back(Layer(Layers[num_layers-2].get_num_neurons(), dataset.targets[0].size()));
+
+    // Set first layer size
+    num_inputs = dataset.data[0].size();
+
+    // error for each epoch in dataset
+    error.assign(dataset.targets.size(), 0);
+}
+
+Neural_NewtworkFF::~Neural_NewtworkFF() {
+
+}
+
+void Neural_NewtworkFF::train_online(int epochs, double tol, double eta, DataSet &mydataset) {
+    int epoch          = 0;
+    double local_error = 0;
+
+    int i = 0;
+    int j = 0;
+    while (epoch <= epochs){
+        epoch++;
+        local_error = 0;
+
+        for (i = 0; i < mydataset.data.size(); i++) {
+            // Calculate Forward
+            Layers[0].calculate(mydataset.data[i]);
+            for (j = 1; j < num_layers; j++) {
+                Layers[j].calculate(Layers[j-1].outputs);
+            }
+
+            get_error_patter(i,mydataset);
+
+            // Calculate Backward
+            Layers[num_layers-1].calculateDeltaOutputs(mydataset.targets[i]);
+            for (j = num_layers-2; j >= 0; j--) {
+                Layers[j].CalculateDeltaHidden(Layers[j+1]);
+            }
+        
+            // Modify Weigths
+            Layers[0].updateWeigths(mydataset.data[i],eta);
+            for ( j = 1; j < num_layers; j++){
+                Layers[j].updateWeigths(Layers[j-1].outputs,eta);
+            }
+        }
+
+        if (error_compare(tol, mydataset) == 1){
+                break;
+        }
+    }
+    total_epochs = epoch-1;
+}
+
+void Neural_NewtworkFF::get_error_patter(int i, DataSet &mydataset) {
+    // Last layer has one neuron 
+    error[i] = (Layers[num_layers-1].outputs[0]- mydataset.targets[i][0]);
+    error[i] *= error[i];
+}
+
+
+int Neural_NewtworkFF::error_compare(double global_error, DataSet &mydataset) {
+    int size = error.size();
+    double training_error = 0;
+
+    int flag = 1;
+    for (int i = 0; i < size; i++){
+        // check all error
+        if (error[i] > global_error){
+            flag = 0;
+        }
+        // Acummulated error
+        training_error += error[i];
+    }
+    // Add error to cum_error in class NNFF
+    training_error = training_error/mydataset.targets.size();
+    cum_error.push_back(training_error);
+
+    return flag;
+}
+
+void Neural_NewtworkFF::show_training_set(DataSet &mydataset){
+    cout << "----------------------" << endl;
+    cout << "* NN val vs Target *" <<endl;
+    for (int i = 0; i < mydataset.data.size(); i++){
+        Layers[0].calculate(mydataset.data[i]);
+        for (int j = 1; j < num_layers; j++){
+            Layers[j].calculate(Layers[j-1].outputs);
+        }
+
+        for (int j = 0; j < Layers[num_layers-1].outputs.size(); j++){
+            cout << setprecision(5) << fixed << Layers[num_layers - 1].outputs[j];
+            cout << "      " << setprecision(1) << mydataset.targets[i][0] << endl;
+        }
+    }
+}
+
+void Neural_NewtworkFF::show_info() {
+    cout << "----------------------" << endl;
+
+    cout <<"Neurons in Layer[0]: "<< num_inputs << endl;
+
+    for (int i = 0; i < num_layers; i++){
+        cout <<"Neurons in Layer["<< i+1 << "]: "<< Layers[i].get_num_neurons() << endl;
+    }
+    cout << "----------------------" << endl;
+
+    cout << "Epochs for training: " << total_epochs << endl;
+    cout << "* Layer[0] has a bias neuron." << endl;
+}
+
+void Neural_NewtworkFF::test(int epochs, int tol, DataSet &mydataset) {
+
 }

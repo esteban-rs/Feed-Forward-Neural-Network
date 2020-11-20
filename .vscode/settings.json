@@ -1,5 +1,23 @@
 {
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "system_error": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "ratio": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "functional": "cpp",
+        "regex": "cpp",
+        "algorithm": "cpp",
+        "memory": "cpp",
+        "iosfwd": "cpp",
+        "numeric": "cpp",
+        "sstream": "cpp"
     }
 }

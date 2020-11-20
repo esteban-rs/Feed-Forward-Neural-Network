@@ -6,10 +6,8 @@ using namespace std;
 class DataSet {
     private:
         int num_inputs = 0;
-        
         vector <int> data_flag_normalize;
         int targets_data_normalize;
-
         void normalize();
         
     public:
@@ -17,11 +15,11 @@ class DataSet {
         ~DataSet();
         
         vector <vector<double>> data;
-        vector <double>         targets;
+        vector <vector<double>> targets;
 
         void get_info();
 
-
+    friend class Neural_NewtworkFF;
 };
 
 class Neuron {
@@ -71,7 +69,6 @@ class Layer {
         double number_of_neurons = 0;
 
         vector <Neuron> Neurons;
-        vector <double> outputs;
 
         double AcumulateDelta(int i, Layer &nextlayer);
 
@@ -80,17 +77,38 @@ class Layer {
         ~Layer ();
 
         double get_num_neurons();
-        
+        vector <double> outputs;
+
         void calculate(vector <double> &input);
         void calculateDeltaOutputs(vector<double> &targets);
         void CalculateDeltaHidden(Layer &nextlayer);
-        void updateWeigths(vector <double> &inputs);
+        void updateWeigths(vector <double> &inputs, double eta);
 };
 
 class Neural_NewtworkFF {
     private:
-        
+        // By default 1 hidden and output layer
+        int num_layers   = 2;
+        int num_inputs   = 0;
+        int total_epochs = 0;
+
+        vector <Layer>  Layers;
+        vector <double> error;
+
+        int error_compare(double error, DataSet &mydataset);
+        void get_error_patter(int i, DataSet &mydataset);
+
     public:
+        Neural_NewtworkFF(int hidden_layers, DataSet &dataset);
+        ~Neural_NewtworkFF();
+
+        vector <double> cum_error;
+
+        void train_online(int epochs, double tol, double eta, DataSet &mydataset);
+        void test(int epochs, int tol, DataSet &mydataset);
+        void show_training_set(DataSet &mydataset);
+        void show_info();
+
 };
 
 #endif
