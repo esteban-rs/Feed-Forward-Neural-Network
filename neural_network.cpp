@@ -251,7 +251,7 @@ Neural_NewtworkFF::Neural_NewtworkFF(int hidden_layers, DataSet &dataset) {
     // Hidden Layers
     for (int i = 1; i < hidden_layers; i++){
 
-        cout << "Neurons for Layer[" << i << "]:    ";
+        cout << "Neurons for Layer[" << i << "]:     ";
         cin >> size;
 
         Layers.push_back(Layer(Layers[i-1].get_num_neurons(), size));
@@ -365,6 +365,8 @@ void Neural_NewtworkFF::show_info() {
     cout << "-----------------------------"<< endl;
     cout << "Epochs for training:      " << total_epochs << endl;
     cout << "* Layer[0] has a bias neuron." << endl;
+
+    cout << endl << "Acummulated Error: " << cum_error[cum_error.size()-1] << endl;
 }
 
 void Neural_NewtworkFF::test(int epochs, int tol, DataSet &mydataset) {

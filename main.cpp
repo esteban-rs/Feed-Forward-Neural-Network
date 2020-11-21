@@ -44,8 +44,8 @@ int main(int argc, char const *argv[]){
     double cpu_time_used = ((double)(end - start))/CLOCKS_PER_SEC; 
     
     mynetwork.show_info();
-    
-    cout << endl << "Execution Time : " << cpu_time_used << "segundos." << endl; 
+
+    cout << "Execution Time :   " << cpu_time_used << " segundos." << endl; 
 
     /*for (int i = 0; i < mynetwork.cum_error.size(); i++){
         cout << mynetwork.cum_error[i] << endl;
